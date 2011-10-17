@@ -2,12 +2,12 @@ require 'rubygems'
 require 'twitter'
 
 class Twitcurlr
-  def initialize
+  def initialize(auth)
     Twitter.configure do |config|
-	config.consumer_key = "JOaCrxrtn8eKgCVOlpWRQ"
-	config.consumer_secret = "brBx60OPfT6DlveRdxuwUFhdTBP9P9xIDbgol3UP8pU"
-	config.oauth_token = "218466084-18G5H2rAWZaMqJH618Dtu7sPGrfHYfAWZIHyyVGd"
-	config.oauth_token_secret = "t6s6H081tGhQew0tBfWZXd6nYsr43NkxMZ8Tgdhd8"
+	config.consumer_key = auth['consumer_key']
+	config.consumer_secret = auth['consumer_secret']
+	config.oauth_token = auth['token']
+	config.oauth_token_secret = auth['token_secret']
       end
     @twitter =  Twitter::Client.new
   end
