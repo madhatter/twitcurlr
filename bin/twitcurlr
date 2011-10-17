@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/twitcurlr.rb'
+
+# run it.
+my_twit = Twitcurlr.new
+puts my_twit.latest_tweets("nostalgix")
+puts "-----------------------------------------------"
+puts my_twit.last_tweet("nostalgix")
