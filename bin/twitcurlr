@@ -47,6 +47,6 @@ end
 
 # run it.
 my_twit = Twitcurlr.new(auth)
-puts my_twit.latest_tweets("nostalgix")
+puts my_twit.latest_tweets
 puts "-----------------------------------------------"
-puts my_twit.last_tweet("nostalgix")
+puts my_twit.last_tweet
