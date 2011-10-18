@@ -19,8 +19,9 @@ class Twitcurlr
     tweets.each do |tweet|
       time_formated = format_time(convert_time(tweet.created_at))
       time_relative = calc_relative_time(convert_time(tweet.created_at)) 
-      puts time_relative[:value].to_s
-      result.push(time_relative[:value].to_s + time_relative[:entity] + "ago"  + "\t\"" + tweet.text + "\"\n")
+      result.push(time_relative[:value].to_s + " " + time_relative[:entity] \
+		  + ("s" unless time_relative[:value] < 2).to_s + " ago "  \
+		  + "\t\"" + tweet.text + "\"\n")
     end
     result
   end
@@ -43,14 +44,15 @@ class Twitcurlr
     atime = {}
     time_now = Time.now.utc
     time_diff = Time.at(time_now - time)
-    if time_diff.min < 1 
-      atime = {:value => time_diff.tv_sec, :entity => 'seconds'}
-    elsif time_diff.min > 59
-      atime = {:value => time_diff.hours, :entity => 'hours'}
-    elsif time_diff.hour > 24
-      atime = {:value => time_diff.days, :entity => 'days'}
+    if time_diff.tv_sec < 59
+      atime = {:value => time_diff.tv_sec, :entity => 'second'}
+    elsif time_diff.tv_sec > 59 && time_diff.tv_sec <= 3599
+      atime = {:value => time_diff.min, :entity => 'minute'}
+    elsif time_diff.tv_sec >= 3599 && time_diff.tv_sec < 86400
+      # substract always 1 hour because time_diff.hour is already '2' at 3649 seconds
+      atime = {:value => time_diff.hour - 1, :entity => 'hour'}
     else
-      atime = {:value => time_diff.min, :entity => 'minutes'}
+      atime = {:value => time_diff.day, :entity => 'day'}
     end
   end
 end
