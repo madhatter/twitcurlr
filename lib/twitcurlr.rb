@@ -19,10 +19,12 @@ class Twitcurlr
     tweets.each do |tweet|
       time_formated = format_time(convert_time(tweet.created_at))
       time_relative = calc_relative_time(convert_time(tweet.created_at)) 
+      # TODO There should be another method to build this string
       result.push(time_relative[:value].to_s + " " + time_relative[:entity] \
 		  + ("s" unless time_relative[:value] < 2).to_s + " ago "  \
-		  + "\t\"" + tweet.text + "\"\n")
+		  + "\t" + tweet.user.screen_name + "\t\"" + tweet.text + "\"\n")
     end
+    # TODO Tests. As content changes just count the elements in the array.
     result
   end
 
