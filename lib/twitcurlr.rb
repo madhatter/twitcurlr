@@ -23,12 +23,12 @@ class Twitcurlr
       time_formated = format_time(convert_time(tweet.created_at))
       time_relative = calc_relative_time(convert_time(tweet.created_at)) 
       unless tweet.id <= @latest_id
-	result.push(get_tweet_string(time_relative, tweet.user.screen_name, tweet.text))
-	latest_id = tweet.id unless tweet.id < latest_id
+	      result.push(get_tweet_string(time_relative, tweet.user.screen_name, tweet.text))
+	      latest_id = tweet.id unless tweet.id < latest_id
       end
     end
     # TODO Tests. As content changes just count the elements in the array.
-    @latest_id = latest_id
+    @latest_id = latest_id unless latest_id == 0
     result
   end
 
