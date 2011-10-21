@@ -10,21 +10,30 @@ class Twitcurlr
 	config.oauth_token_secret = auth['token_secret']
       end
     @twitter =  Twitter::Client.new
+    @latest_id = 0
   end
 
   def latest_tweets(username = nil, count = 20)
     result = Array.new
+    loop_count = 0
+    latest_id = 0
     #tweets = Twitter.user_timeline(username, {:count => count})
     tweets = @twitter.home_timeline({:count => count})
     tweets.each do |tweet|
       time_formated = format_time(convert_time(tweet.created_at))
       time_relative = calc_relative_time(convert_time(tweet.created_at)) 
       # TODO There should be another method to build this string
-      result.push(time_relative[:value].to_s + " " + time_relative[:entity] \
-		  + ("s" unless time_relative[:value] < 2).to_s + " ago "  \
-		  + "\t" + tweet.user.screen_name + "\t\"" + tweet.text + "\"\n")
+      puts "@latest_id = #{@latest_id} , tweet_id = #{tweet.id}"
+      unless tweet.id <= @latest_id
+	result.push(time_relative[:value].to_s + " " + time_relative[:entity] \
+		    + ("s" unless time_relative[:value] < 2).to_s + " ago "  \
+		    + "\t" + tweet.user.screen_name + "\t\"" + tweet.text + "\"\n")
+	latest_id = tweet.id if loop_count == 0
+	loop_count += 1
+      end
     end
     # TODO Tests. As content changes just count the elements in the array.
+    @latest_id = latest_id
     result
   end
 
