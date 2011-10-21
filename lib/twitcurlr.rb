@@ -10,26 +10,21 @@ class Twitcurlr
 	config.oauth_token_secret = auth['token_secret']
       end
     @twitter =  Twitter::Client.new
+    # TODO Maybe it would be a good idea to store this in an file if the daemon stops
     @latest_id = 0
   end
 
   def latest_tweets(username = nil, count = 20)
     result = Array.new
-    loop_count = 0
     latest_id = 0
     #tweets = Twitter.user_timeline(username, {:count => count})
     tweets = @twitter.home_timeline({:count => count})
     tweets.each do |tweet|
       time_formated = format_time(convert_time(tweet.created_at))
       time_relative = calc_relative_time(convert_time(tweet.created_at)) 
-      # TODO There should be another method to build this string
-      puts "@latest_id = #{@latest_id} , tweet_id = #{tweet.id}"
       unless tweet.id <= @latest_id
-	result.push(time_relative[:value].to_s + " " + time_relative[:entity] \
-		    + ("s" unless time_relative[:value] < 2).to_s + " ago "  \
-		    + "\t" + tweet.user.screen_name + "\t\"" + tweet.text + "\"\n")
-	latest_id = tweet.id if loop_count == 0
-	loop_count += 1
+	result.push(get_tweet_string(time_relative, tweet.user.screen_name, tweet.text))
+	latest_id = tweet.id unless tweet.id < latest_id
       end
     end
     # TODO Tests. As content changes just count the elements in the array.
@@ -39,6 +34,11 @@ class Twitcurlr
 
   def last_tweet(username = nil)
     latest_tweets(username, 1)
+  end
+
+  def get_tweet_string(time_rel, screen_name, text)
+    time_rel[:value].to_s + " " + time_rel[:entity] + ("s" unless time_rel[:value] < 2).to_s \
+	    + " ago " + "\t" + screen_name + "\t\"" + text + "\"\n"
   end
 
   def convert_time(date_string)
