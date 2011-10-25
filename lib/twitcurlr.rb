@@ -30,7 +30,6 @@ class Twitcurlr
     end
     # TODO Tests. As content changes just count the elements in the array.
     @latest_id = latest_id unless latest_id == 0
-    puts @hashtags
     result
   end
 
