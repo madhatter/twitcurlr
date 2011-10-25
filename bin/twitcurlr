@@ -8,12 +8,12 @@ require_relative '../lib/twitcurlr.rb'
 begin
   auth = {}
   auth_file = File.join(Dir.pwd, 'config', 'auth.yml')
-  CONFIG = YAML.load_file(auth_file)
+  AUTH = YAML.load_file(auth_file)
 
-  auth['consumer_key'] = CONFIG['consumer_key']
-  auth['consumer_secret'] = CONFIG['consumer_secret']
-  auth['token'] = CONFIG['token']
-  auth['token_secret'] = CONFIG['token_secret']
+  auth['consumer_key'] = AUTH['consumer_key']
+  auth['consumer_secret'] = AUTH['consumer_secret']
+  auth['token'] = AUTH['token']
+  auth['token_secret'] = AUTH['token_secret']
 
   unless auth['token']
       consumer = OAuth::Consumer.new auth['consumer_key'],
@@ -40,13 +40,20 @@ begin
       File.open(auth_file, 'w') {|f| YAML.dump(auth, f)}
   end
 
+  config_file = File.join(Dir.pwd, 'config', 'twitcurlr.yml')
+  CONFIG = YAML.load_file(config_file)
+
+  LOGLEVEL = CONFIG['loglevel'] || Logger::INFO
+  HASHTAGS = CONFIG['hashtags'].split(',').collect { |hashtag| hashtag.strip }
+ 
 rescue SystemCallError
   $stderr.puts "What did you do!?!"
   exit(1)
 end
 
 # run it.
-my_twit = Twitcurlr.new(auth)
-puts my_twit.latest_tweets
-puts "-----------------------------------------------"
-puts my_twit.last_tweet
+my_twit = Twitcurlr.new(auth, HASHTAGS)
+#puts my_twit.latest_tweets
+#puts "-----------------------------------------------"
+#puts my_twit.last_tweet
+puts my_twit.curl(nil, 40)

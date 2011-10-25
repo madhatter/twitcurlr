@@ -10,12 +10,12 @@ require_relative '../lib/twitcurlr.rb'
 begin
   auth = {}
   auth_file = File.join(Dir.pwd, 'config', 'auth.yml')
-  CONFIG = YAML.load_file(auth_file)
+  AUTH = YAML.load_file(auth_file)
 
-  auth['consumer_key'] = CONFIG['consumer_key']
-  auth['consumer_secret'] = CONFIG['consumer_secret']
-  auth['token'] = CONFIG['token']
-  auth['token_secret'] = CONFIG['token_secret']
+  auth['consumer_key'] = AUTH['consumer_key']
+  auth['consumer_secret'] = AUTH['consumer_secret']
+  auth['token'] = AUTH['token']
+  auth['token_secret'] = AUTH['token_secret']
 
   # TODO if not authorized yet... this has to be somewhere else
   unless auth['token'] && auth['token_secret']
@@ -47,7 +47,8 @@ begin
   CONFIG = YAML.load_file(config_file)
 
   LOGLEVEL = CONFIG['loglevel'] || Logger::INFO
-  @twitcurlr = Twitcurlr.new(auth)
+  HASHTAGS = CONFIG['hashtags'].split(',').collect { |hashtag| hashtag.strip }
+  @twitcurlr = Twitcurlr.new(auth, HASHTAGS)
 rescue SystemCallError
   $stderr.puts "What did you do!?!"
   exit(1)
@@ -63,13 +64,14 @@ Daemons.run_proc('twitcurlr', :dir_mode => :script, :dir => './', \
     EventMachine::add_periodic_timer(60) {
       @log.info "curling..."
       results = @twitcurlr.last_tweet
-      if results
+      if results.count > 0
         results.each do |tweet|
           @log.info tweet
         end
       else
-        @log.info "It's log, it's log, \
-        It's big, it's heavy, it's wood. \
+        @log.info "\n
+        It's log, it's log,\n \
+        It's big, it's heavy, it's wood.\n \
         It's log, it's log, it's better than bad, it's good.\n"
       end
     }
