@@ -45,6 +45,7 @@ class Twitcurlr
     tweets.each do |tweet|
       time_formated = format_time(convert_time(tweet.created_at))
       time_relative = calc_relative_time(convert_time(tweet.created_at)) 
+      # TODO Ignore Retweets!
       unless tweet.id <= @latest_id
         matched_tweet = search_for_tags(tweet.text).to_s
         unless matched_tweet.empty?
@@ -53,7 +54,6 @@ class Twitcurlr
         end
       end
     end
-    # TODO Tests. As content changes just count the elements in the array.
     @latest_id = latest_id unless latest_id == 0
     result
   end
