@@ -47,7 +47,7 @@ begin
   CONFIG = YAML.load_file(config_file)
 
   LOGLEVEL = CONFIG['loglevel'] || Logger::INFO
-  HASHTAGS = CONFIG['hashtags'].split(',').collect { |hashtag| hashtag.strip }
+  HASHTAGS = CONFIG['hashtags'].split(',').collect { |hashtag| "#" + hashtag.strip }
   @twitcurlr = Twitcurlr.new(auth, HASHTAGS)
 rescue SystemCallError
   $stderr.puts "What did you do!?!"
