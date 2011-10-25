@@ -63,7 +63,7 @@ Daemons.run_proc('twitcurlr', :dir_mode => :script, :dir => './', \
   EventMachine::run {
     EventMachine::add_periodic_timer(60) {
       @log.info "curling..."
-      results = @twitcurlr.last_tweet
+      results = @twitcurlr.curl(nil, 40)
       if results.count > 0
         results.each do |tweet|
           @log.info tweet
