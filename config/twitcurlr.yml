@@ -1,4 +1,5 @@
 # TwitCurl configuration file
 
 loglevel: 0
-hashtags: newgirl, foo, bar, ePub
+hashtags: newgirl, foo, wtf, ePub
+search_type: public # public search curls through all tweets, private curls your timeline
