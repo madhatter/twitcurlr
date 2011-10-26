@@ -45,8 +45,7 @@ class Twitcurlr
     tweets.each do |tweet|
       time_formated = format_time(convert_time(tweet.created_at))
       time_relative = calc_relative_time(convert_time(tweet.created_at)) 
-      # TODO Ignore Retweets!
-      unless tweet.id <= @latest_id
+      unless tweet.id <= @latest_id || tweet.retweeted
         matched_tweet = search_for_tags(tweet.text)
         if matched_tweet
           result.push(get_tweet_string(time_relative, tweet.user.screen_name, matched_tweet[0].to_s))
@@ -59,6 +58,7 @@ class Twitcurlr
   end
 
   def search_for_tags(tweet)
+    # TODO Collect all matching tags in an own array to return.
     @hashtags.each do |tag|
       if tweet =~ /#{tag}/
         return tweet, tag
