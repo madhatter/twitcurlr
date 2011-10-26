@@ -47,9 +47,9 @@ class Twitcurlr
       time_relative = calc_relative_time(convert_time(tweet.created_at)) 
       # TODO Ignore Retweets!
       unless tweet.id <= @latest_id
-        matched_tweet = search_for_tags(tweet.text).to_s
-        unless matched_tweet.empty?
-          result.push(get_tweet_string(time_relative, tweet.user.screen_name, matched_tweet.to_s))
+        matched_tweet = search_for_tags(tweet.text)
+        if matched_tweet
+          result.push(get_tweet_string(time_relative, tweet.user.screen_name, matched_tweet[0].to_s))
           latest_id = tweet.id unless tweet.id < latest_id
         end
       end
