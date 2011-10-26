@@ -40,8 +40,11 @@ class Twitcurlr
   def curl(username = nil, count = 20)
     result = Array.new
     latest_id = 0
-    #tweets = Twitter.user_timeline(username, {:count => count})
-    tweets = @twitter.home_timeline({:count => count})
+    if username
+      tweets = Twitter.user_timeline(username, {:count => count})
+    else
+      tweets = @twitter.home_timeline({:count => count})
+    end
     tweets.each do |tweet|
       time_formated = format_time(convert_time(tweet.created_at))
       time_relative = calc_relative_time(convert_time(tweet.created_at)) 

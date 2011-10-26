@@ -48,6 +48,7 @@ begin
 
   LOGLEVEL = CONFIG['loglevel'] || Logger::INFO
   HASHTAGS = CONFIG['hashtags'].split(',').collect { |hashtag| "#" + hashtag.strip }
+  SEARCH_TYPE = CONFIG['search_type']
   @twitcurlr = Twitcurlr.new(auth, HASHTAGS)
 rescue SystemCallError
   $stderr.puts "What did you do!?!"
@@ -63,7 +64,18 @@ Daemons.run_proc('twitcurlr', :dir_mode => :script, :dir => './', \
   EventMachine::run {
     EventMachine::add_periodic_timer(60) {
       @log.info "curling..."
-      results = @twitcurlr.curl(nil, 40)
+      begin
+        if SEARCH_TYPE == 'private'
+          results = @twitcurlr.curl(nil, 40)
+        elsif SEARCH_TYPE == 'public'
+          # TODO
+        else
+          results = @twitcurlr.curl(SEARCH_TYPE, 40)
+        end
+      rescue InternalServerError
+        $stderr.puts "Something went wrong."
+      end
+
       if results.count > 0
         results.each do |tweet|
           @log.info tweet
