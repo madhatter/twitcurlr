@@ -34,5 +34,17 @@ describe Twitcurlr do
     response = twitcurlr.search_for_tags("Testing twitcurlr, no woot")
     response.should be_nil
   end
+
+  it "should extract an URL from a string (tweet)" do
+    twitcurlr = @twitcurlr
+    response = twitcurlr.extract_url_from_tweet("Follow the link http://bit.to/bla12fasel #lnk")
+    response.should == 'http://bit.to/bla12fasel'
+  end
+
+  it "should extract an URL when it's the last word" do
+    twitcurlr = @twitcurlr
+    response = twitcurlr.extract_url_from_tweet("Follow the link http://img.ly/crap2l")
+    response.should == 'http://img.ly/crap2l'
+  end
 end
 
