@@ -56,4 +56,6 @@ my_twit = Twitcurlr.new(auth, HASHTAGS)
 #puts my_twit.latest_tweets
 #puts "-----------------------------------------------"
 #puts my_twit.last_tweet
-puts my_twit.curl(nil, 40)
+#puts my_twit.curl(nil, 40)
+puts my_twit.search_for_tags('The reason #tagessh')
+puts my_twit.extract_url_from_tweet('Just click here http://bit.lo/12387')

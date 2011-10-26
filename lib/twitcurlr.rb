@@ -59,14 +59,20 @@ class Twitcurlr
   end
 
   def search_for_tags(tweet)
-    hit = false
     @hashtags.each do |tag|
       if tweet =~ /#{tag}/
-        #puts "Treffer!"
-        hit = true
+        return tweet, tag
       end
     end
-    return hit ? tweet : nil
+    return nil
+  end
+
+  def extract_url_from_tweet(tweet)
+    start = tweet.index('http')
+    if start
+      stop = tweet.index(' ', start) || 0
+    end
+    tweet[start..stop -1]
   end
 
   def get_tweet_string(time_rel, screen_name, text)
