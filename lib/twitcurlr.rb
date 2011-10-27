@@ -1,7 +1,13 @@
 require 'rubygems'
 require 'twitter'
+require 'curb'
+require 'json'
+require 'logger'
 
 class Twitcurlr
+  LOCATION_START = 'Location: '
+  LOCATION_STOP  = "\r\n"
+
   def initialize(auth, hashtags)
     Twitter.configure do |config|
 	config.consumer_key = auth['consumer_key']
@@ -13,6 +19,9 @@ class Twitcurlr
     @hashtags = hashtags
     # TODO Maybe it would be a good idea to store this in an file if the daemon stops
     @latest_id = 0
+    @log = Logger.new(STDOUT)
+    @log.level = -1
+    @log.debug "log level set to #{@log.level}"
   end
 
   def latest_tweets(username = nil, count = 20)
@@ -51,6 +60,8 @@ class Twitcurlr
       unless tweet.id <= @latest_id || tweet.retweeted
         matched_tweet = search_for_tags(tweet.text)
         if matched_tweet
+          link = extract_image_url(matched_tweet[0])
+          @log.debug link.to_s
           result.push(get_tweet_string(time_relative, tweet.user.screen_name, matched_tweet[0].to_s))
           latest_id = tweet.id unless tweet.id < latest_id
         end
@@ -63,11 +74,27 @@ class Twitcurlr
   def search_for_tags(tweet)
     # TODO Collect all matching tags in an own array to return.
     @hashtags.each do |tag|
-      if tweet =~ /#{tag}/
+      # matching case-insesitive
+      if tweet.downcase =~ /#{tag}/
         return tweet, tag
       end
     end
     return nil
+  end
+
+  def extract_image_url(tweet)
+    @log.debug "#{tweet}"
+    url = extract_url_from_tweet(tweet)
+    analyse_image_url(url)
+  end
+
+  def analyse_image_url(url)
+    rurl = nil
+    if !url.nil?
+      rurl = get_tco_image(url) if url.index 't.co'
+      rurl = get_twitpic_image(url) if url.index 'twitpic'
+    end
+    rurl
   end
 
   def extract_url_from_tweet(tweet)
@@ -76,6 +103,38 @@ class Twitcurlr
       stop = tweet.index(' ', start) || 0
     end
     tweet[start..stop -1]
+  end
+
+  def get_tco_image(url) 
+    real_url = get_redirect_link(url)
+    analyse_image_url(real_url)
+  end
+
+  def get_twitpic_image(url)
+    @log.debug "twitpic"
+    get_redirect_image(url, "http://twitpic.com/show/full/")
+  end
+
+  def get_redirect_link(short_link, stop_indicator = LOCATION_STOP)
+    resp = Curl::Easy.http_get(short_link) { |res| res.follow_location = true }
+    @log.debug "#{resp.header_str}"
+    if(resp && resp.header_str.index(LOCATION_START) \
+       && resp.header_str.index(stop_indicator))
+      start = resp.header_str.index(LOCATION_START) + LOCATION_START.size
+      stop = resp.header_str.index(stop_indicator, start)
+      resp.header_str[start..stop]
+    else
+      nil
+    end
+  end
+
+  def get_redirect_image(image_url, service_endpoint, stop_indicator = LOCATION_STOP)
+    get_redirect_link("#{service_endpoint}#{extract_image_id(image_url)}", stop_indicator)
+    @log.debug "#{service_endpoint}#{extract_image_id(image_url)}"
+  end
+
+  def extract_image_id(link)
+    link.split('/').last if link.split('/')
   end
 
   def get_tweet_string(time_rel, screen_name, text)

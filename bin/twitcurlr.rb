@@ -62,7 +62,7 @@ Daemons.run_proc('twitcurlr', :dir_mode => :script, :dir => './', \
   @log.info "creating a new twitcurlr instance using this config: \n#{CONFIG.inspect}"
 
   EventMachine::run {
-    EventMachine::add_periodic_timer(60) {
+    EventMachine::add_periodic_timer(20) {
       @log.info "curling..."
       begin
         if SEARCH_TYPE == 'private'

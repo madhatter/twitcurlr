@@ -35,6 +35,12 @@ describe Twitcurlr do
     response.should be_nil
   end
 
+  it "should ignore the case when matching tags" do
+    twitcurlr = @twitcurlr
+    response = twitcurlr.search_for_tags("Uppercase FTW. #WOOT.")
+    response.should_not be_empty
+  end
+
   it "should extract an URL from a string (tweet)" do
     twitcurlr = @twitcurlr
     response = twitcurlr.extract_url_from_tweet("Follow the link http://bit.to/bla12fasel #lnk")

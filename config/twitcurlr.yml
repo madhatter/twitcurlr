@@ -4,4 +4,4 @@ loglevel: 0
 hashtags: newgirl, foo, wtf, goldstar
 # public search curls through all tweets, private curls your timeline 
 # or add a username (without the @)
-search_type: nostalgix
+search_type: comic_fanboy
