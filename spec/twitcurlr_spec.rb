@@ -52,5 +52,11 @@ describe Twitcurlr do
     response = twitcurlr.extract_url_from_tweet("Follow the link http://img.ly/crap2l")
     response.should == 'http://img.ly/crap2l'
   end
+
+  it "should get the header for the given short url" do
+    twitcurlr = @twitcurlr
+    response = twitcurlr.get_redirect_link("http://twitpic.com/show/full/76ktj4")
+    response.should_not be_empty
+  end
 end
 

@@ -94,6 +94,7 @@ class Twitcurlr
       rurl = get_tco_image(url) if url.index 't.co'
       rurl = get_twitpic_image(url) if url.index 'twitpic'
     end
+    @log.debug "Got it: #{rurl}"
     rurl
   end
 
@@ -106,6 +107,7 @@ class Twitcurlr
   end
 
   def get_tco_image(url) 
+    @log.debug "t.co"
     real_url = get_redirect_link(url)
     analyse_image_url(real_url)
   end
@@ -116,21 +118,35 @@ class Twitcurlr
   end
 
   def get_redirect_link(short_link, stop_indicator = LOCATION_STOP)
-    resp = Curl::Easy.http_get(short_link) { |res| res.follow_location = true }
+    try = 0
+    begin
+      resp = Curl::Easy.http_get(short_link) { |res| res.follow_location = true }
+    rescue => err
+      @log.error "Curl::Easy.http_get failed: #{err}"
+      try += 1
+      sleep 3
+      if try < 5
+        retry
+      else 
+        return nil
+      end
+    end
     @log.debug "#{resp.header_str}"
     if(resp && resp.header_str.index(LOCATION_START) \
        && resp.header_str.index(stop_indicator))
       start = resp.header_str.index(LOCATION_START) + LOCATION_START.size
       stop = resp.header_str.index(stop_indicator, start)
+      @log.debug "Get redirect link"
       resp.header_str[start..stop]
     else
+      @log.debug "Not getting redirect link for #{short_link}"
       nil
     end
   end
 
   def get_redirect_image(image_url, service_endpoint, stop_indicator = LOCATION_STOP)
-    get_redirect_link("#{service_endpoint}#{extract_image_id(image_url)}", stop_indicator)
     @log.debug "#{service_endpoint}#{extract_image_id(image_url)}"
+    get_redirect_link "#{service_endpoint}#{extract_image_id image_url }", stop_indicator
   end
 
   def extract_image_id(link)
