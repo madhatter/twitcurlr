@@ -58,5 +58,11 @@ describe Twitcurlr do
     response = twitcurlr.get_redirect_link("http://twitpic.com/show/full/76ktj4")
     response.should_not be_empty
   end
+
+  it "should work when called twice for a t.co url" do
+    twitcurlr = @twitcurlr
+    response = twitcurlr.get_tco_image("http://t.co/3NHnPsjF")
+    response.should_not be_empty
+  end
 end
 

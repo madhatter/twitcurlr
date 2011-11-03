@@ -119,8 +119,11 @@ class Twitcurlr
 
   def get_redirect_link(short_link, stop_indicator = LOCATION_STOP)
     try = 0
+    resp = 'empty'
     begin
+      @log.debug short_link.class
       resp = Curl::Easy.http_get(short_link) { |res| res.follow_location = true }
+      @log.debug resp.response_code
     rescue => err
       @log.error "Curl::Easy.http_get failed: #{err}"
       try += 1
@@ -131,6 +134,7 @@ class Twitcurlr
         return nil
       end
     end
+    @log.debug resp.response_code
     @log.debug "#{resp.header_str}"
     if(resp && resp.header_str.index(LOCATION_START) \
        && resp.header_str.index(stop_indicator))
