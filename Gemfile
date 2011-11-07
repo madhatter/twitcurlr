@@ -10,6 +10,6 @@ gem 'oauth'
 group :test, :development do
 	gem 'rspec'
 	gem 'autotest'
-	gem 'autotest-growl' 
-	gem 'autotest-fsevent'
+	#gem 'autotest-growl' 
+	#gem 'autotest-fsevent'
 end
