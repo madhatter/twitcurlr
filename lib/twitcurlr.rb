@@ -2,6 +2,7 @@ require 'rubygems'
 require 'twitter'
 require 'curb'
 require 'json'
+require 'logger'
 
 class Twitcurlr
   LOCATION_START = 'Location: '
@@ -19,7 +20,7 @@ class Twitcurlr
     # TODO Maybe it would be a good idea to store this in an file if the daemon stops
     @latest_id = 0
     @log = Logger.new(STDOUT)
-    @log.level = -1 # set to -1 for debugging log
+    @log.level = 1 # set to -1 for debugging log
     @log.debug "log level set to #{@log.level}"
   end
 
