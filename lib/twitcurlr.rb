@@ -2,7 +2,6 @@ require 'rubygems'
 require 'twitter'
 require 'curb'
 require 'json'
-require 'logger'
 
 class Twitcurlr
   LOCATION_START = 'Location: '
@@ -20,7 +19,7 @@ class Twitcurlr
     # TODO Maybe it would be a good idea to store this in an file if the daemon stops
     @latest_id = 0
     @log = Logger.new(STDOUT)
-    @log.level = 1 # set to -1 for debugging log
+    @log.level = -1 # set to -1 for debugging log
     @log.debug "log level set to #{@log.level}"
   end
 
@@ -62,7 +61,7 @@ class Twitcurlr
         if matched_tweet
           link = extract_image_url(matched_tweet[0])
           @log.debug link.to_s
-          result.push(get_tweet_string(time_relative, tweet.user.screen_name, matched_tweet[0].to_s))
+          result.push(get_tweet_string(time_relative, tweet.user.screen_name, matched_tweet[0].to_s)) if link
           latest_id = tweet.id unless tweet.id < latest_id
         end
       end
@@ -85,7 +84,7 @@ class Twitcurlr
   def extract_image_url(tweet)
     @log.debug "#{tweet}"
     url = extract_url_from_tweet(tweet)
-    analyse_image_url(url)
+    analyse_image_url(url) if url
   end
 
   def analyse_image_url(url)
@@ -102,8 +101,9 @@ class Twitcurlr
     start = tweet.index('http')
     if start
       stop = tweet.index(' ', start) || 0
+      return tweet[start..stop -1]
     end
-    tweet[start..stop -1]
+    return nil
   end
 
   def get_tco_image(url) 

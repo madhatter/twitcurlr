@@ -47,7 +47,8 @@ begin
   CONFIG = YAML.load_file(config_file)
 
   LOGLEVEL = CONFIG['loglevel'] || Logger::INFO
-  HASHTAGS = CONFIG['hashtags'].split(',').collect { |hashtag| "#" + hashtag.strip }
+  TAGSEARCH = CONFIG['tag_search'].zero?
+  HASHTAGS = CONFIG['hashtags'].split(',').collect { |hashtag| !TAGSEARCH ? "#" + hashtag.strip : hashtag.strip }
   SEARCH_TYPE = CONFIG['search_type']
   @twitcurlr = Twitcurlr.new(auth, HASHTAGS)
 rescue SystemCallError
@@ -63,7 +64,7 @@ Daemons.run_proc('twitcurlr', :dir_mode => :script, :dir => './', \
 
   EventMachine::run {
     EventMachine::add_periodic_timer(20) {
-      @log.info "curling..."
+      @log.info "curling for #{HASHTAGS} ..."
       begin
         if SEARCH_TYPE == 'private'
           results = @twitcurlr.curl(nil, 40)
